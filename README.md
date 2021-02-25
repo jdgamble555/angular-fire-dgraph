@@ -2,6 +2,8 @@
 
 # Configuration
 
+Create a [Slash Dgraph](https://slash.dgraph.io/) project with this [schema.graphql](schema.graphql)
+
 Configure **environments/environment.ts**
 
 ```typescript
