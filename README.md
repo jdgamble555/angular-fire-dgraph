@@ -4,6 +4,7 @@
 
 Configure **environments/environment.ts**
 
+```typescript
 environment = {
   production: false,
   firebase: {
@@ -13,6 +14,7 @@ environment = {
   },
   uri: 'Your endpoint'
 }
+```
 
 # URQL NOTES
 
