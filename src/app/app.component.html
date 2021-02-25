@@ -1,0 +1,23 @@
+<section>
+  <ng-container *ngIf="user">
+    <h3>Hi {{ user.displayName }}!</h3>
+    <img [src]="user.photoURL" width="100" alt="user avatar">
+    <p>Your userID is {{ user.uid }}</p>
+    <button (click)="signOut()">Sign Out</button>
+  </ng-container>
+  <ng-container *ngIf="!user">
+    <button (click)="signIn()">Sign In</button>
+  </ng-container>
+</section>
+<h1>Angular DGraph todo</h1>
+<section>
+  <ul>
+    <li *ngFor="let t of dg.tasks">
+      <span class="{{ t.completed ? 'is-complete' : ''}}">{{ t.title }} - {{ t.id }} </span>
+      <button (click)="toggle(t.id, t.completed)">{{ t.completed ? ' ❌ ' : ' ✔️ '}}</button>
+      <button (click)="remove(t.id)"> 🗑 </button>
+    </li>
+  </ul>
+</section>
+<input #title (keyup.enter)="add(title.value)" />
+<button (click)="add(title.value)">Add Task</button>
