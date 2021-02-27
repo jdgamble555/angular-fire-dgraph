@@ -26,17 +26,17 @@ export class DgraphService implements OnDestroy {
    * Note: to just return an RXJS Observable
    * for use in the template directly...
    *
-   * const sub = new BehaviorSubject<any>([]);
-   * pipe(
-   * this.urql.client.subscription(q),
-   * map((r: any) => {
-   * return r.data.queryTask
-   * }),
-   * subscribe((r: any) => {
-   * sub.next(r);
-   * })
-   * );
-   * return sub;
+   *  import { from } from 'zen-observable';
+   *  import { Observable } from 'rxjs';
+   *
+   *   subscription(q: any): Observable<any[]> {
+   *     return from(
+   *       pipe(
+   *         this.urql.client.subscription(q),
+   *         map((r: any) => return r.data.queryTask),
+   *         toObservable
+   *      ) as any) as any;
+   *    }
    *
    */
   async query(q: any, subscription = true): Promise<any> {

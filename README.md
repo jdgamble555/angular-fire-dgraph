@@ -22,7 +22,7 @@ environment = {
 
 These were  installed:
 
-- @urql/core graphql
+- npm i @urql/core graphql
 
 - npm i subscriptions-transport-ws ws
 - npm i --save-dev @types/ws
@@ -35,14 +35,15 @@ These were  installed:
 - ng add @nguniversal/express-engine
 - ng add @angular/fire
 
-- queries.ts - all dgraph queries
-
-Added to allowedCommonJsDependencies
-subscriptions-transport-ws
-isomorphic-unfetch
-
 - npm i zen-observable
 - npm i --save-dev @types/zen-observable
+
+Added to allowedCommonJsDependencies in angular.json
+- subscriptions-transport-ws
+- isomorphic-unfetch
+- zen-observable
+
+queries.ts - all dgraph queries
 
 Added HttpClientModule for fetch replacement
 Added Firebase Modules
