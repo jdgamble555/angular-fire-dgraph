@@ -36,7 +36,8 @@
             "scripts": [],
             "allowedCommonJsDependencies": [
               "subscriptions-transport-ws",
-              "isomorphic-unfetch"
+              "isomorphic-unfetch",
+              "zen-observable"
             ]
           },
           "configurations": {

@@ -1,6 +1,5 @@
 import { Inject, NgModule, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { environment } from './../../environments/environment';
 import {
   cacheExchange,
@@ -16,20 +15,24 @@ import 'isomorphic-unfetch';
 import * as ws from 'ws';
 import { SSRExchange } from '@urql/core/dist/types/exchanges/ssr';
 import { HttpClient } from '@angular/common/http';
+import { pipe, toObservable } from 'wonka';
+import { from } from 'zen-observable';
+import { Observable } from 'rxjs';
 
 @NgModule({
   declarations: [],
   imports: [CommonModule],
 })
 export class UrqlModule {
-  client!: Client;
+
+  private client!: Client;
 
   ssr!: SSRExchange;
 
   constructor(
     @Inject(PLATFORM_ID) platformId: Object,
     private http: HttpClient
-    ) {
+  ) {
 
     const isServerSide = !isPlatformBrowser(platformId);
 
@@ -76,5 +79,21 @@ export class UrqlModule {
         }),
       ],
     });
+  }
+
+  subscription(q: any): Observable<any[]> {
+    return from(
+      pipe(
+        this.client.subscription(q),
+        toObservable
+      ) as any) as any;
+  }
+
+  async query(q: any): Promise<any> {
+    return await this.client.query(q).toPromise();
+  }
+
+  async mutation(q: any, vars: any): Promise<any> {
+    return await this.client.mutation(q, vars).toPromise();
   }
 }
