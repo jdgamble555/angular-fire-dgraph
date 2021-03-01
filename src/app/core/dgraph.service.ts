@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { UrqlModule } from './urql.module';
-import { map } from 'rxjs/operators';
-import { from } from 'rxjs';
 
 
 interface Task {
@@ -24,14 +22,11 @@ export class DgraphService {
 
   async query(q: any, subscription = true): Promise<any> {
 
-    //this.tasks = this.urql.subscription(q).map((r: any) => r.data.queryTask);
-
     // client
     if (subscription) {
-      this.urql.subscription(q)
-        .subscribe((r: any) => {
-          this.tasks = r.data.queryTask
-        });
+      this.urql.subscription(q).subscribe((r: any) => {
+        this.tasks = r.data.queryTask;
+      });
       // server
     } else {
       this.tasks = await this.urql.query(q)

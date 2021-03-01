@@ -38,7 +38,6 @@
     "tslib": "^2.0.0",
     "utf-8-validate": "^5.0.4",
     "ws": "^7.4.3",
-    "zen-observable": "^0.8.15",
     "zone.js": "~0.11.3"
   },
   "devDependencies": {
@@ -52,7 +51,6 @@
     "@types/node": "^12.11.1",
     "@types/node-fetch": "^2.5.8",
     "@types/ws": "^7.4.0",
-    "@types/zen-observable": "^0.8.2",
     "codelyzer": "^6.0.0",
     "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",

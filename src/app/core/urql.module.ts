@@ -16,8 +16,7 @@ import * as ws from 'ws';
 import { SSRExchange } from '@urql/core/dist/types/exchanges/ssr';
 import { HttpClient } from '@angular/common/http';
 import { pipe, toObservable } from 'wonka';
-import { from } from 'zen-observable';
-import { from as Rfrom, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 
 @NgModule({
   declarations: [],
@@ -29,16 +28,18 @@ export class UrqlModule {
 
   ssr!: SSRExchange;
 
+  isServerSide!: boolean;
+
   constructor(
     @Inject(PLATFORM_ID) platformId: Object,
     private http: HttpClient
   ) {
 
-    const isServerSide = !isPlatformBrowser(platformId);
+    this.isServerSide = !isPlatformBrowser(platformId);
 
     const ssr = ssrExchange({
-      isClient: !isServerSide,
-      initialState: !isServerSide ? (window as any).__URQL_DATA__ : undefined,
+      isClient: !this.isServerSide,
+      initialState: !this.isServerSide ? (window as any).__URQL_DATA__ : undefined,
     });
 
     const subscriptionClient = new SubscriptionClient(
@@ -47,7 +48,7 @@ export class UrqlModule {
         reconnect: true,
         lazy: true,
       },
-      isServerSide ? ws : null
+      this.isServerSide ? ws : null
     );
     this.client = createClient({
       // replace fetch with httpclient for ssr
@@ -81,13 +82,14 @@ export class UrqlModule {
     });
   }
 
-  subscription(q: any): Observable<any[]> {
-    return from(
+  subscription(q: any): any {
+    return new Observable((observer: any) => {
       pipe(
         this.client.subscription(q),
         toObservable
-      ) as any
-    ) as any;
+      ).subscribe(observer);
+    });
+
   }
 
   async query(q: any): Promise<any> {
