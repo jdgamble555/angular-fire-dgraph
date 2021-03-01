@@ -56,7 +56,7 @@ export class AppComponent implements OnInit {
   async ngOnInit(): Promise<void> {
 
     if (!this.isBrowser) {
-      await this.dg.query(GET_TASKS, false)
+      this.dg.query(GET_TASKS, false)
     } else {
       this.dg.query(SUB_GET_TASKS, true);
     }
@@ -69,7 +69,7 @@ export class AppComponent implements OnInit {
     this.dg.delete(id);
 
     // remove task from db
-    await this.dg.mutation(DEL_TASK, {
+    await this.dg.urql.mutation(DEL_TASK, {
       id: [id]
     })
       .then((r: any) => {
@@ -92,7 +92,7 @@ export class AppComponent implements OnInit {
     this.dg.add(task);
 
     // add task to db
-    await this.dg.mutation(ADD_TASK, {
+    await this.dg.urql.mutation(ADD_TASK, {
       task
     })
       .then((r: any) => {
@@ -117,7 +117,7 @@ export class AppComponent implements OnInit {
     this.dg.update(taskUpdate);
 
     // toggle completed
-    await this.dg.mutation(UPDATE_TASK, taskUpdate)
+    await this.dg.urql.mutation(UPDATE_TASK, taskUpdate)
       .then((r: any) => {
         if (r.error) {
           console.log(r.error);

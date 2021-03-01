@@ -17,7 +17,7 @@ import { SSRExchange } from '@urql/core/dist/types/exchanges/ssr';
 import { HttpClient } from '@angular/common/http';
 import { pipe, toObservable } from 'wonka';
 import { from } from 'zen-observable';
-import { Observable } from 'rxjs';
+import { from as Rfrom, Observable } from 'rxjs';
 
 @NgModule({
   declarations: [],
@@ -86,7 +86,8 @@ export class UrqlModule {
       pipe(
         this.client.subscription(q),
         toObservable
-      ) as any) as any;
+      ) as any
+    ) as any;
   }
 
   async query(q: any): Promise<any> {
