@@ -13,11 +13,10 @@ interface Task {
 })
 export class DgraphService {
 
-  //tasks: Task[];
-  tasks: any;
+  tasks: Task[];
 
   constructor(public urql: UrqlModule) {
-    //this.tasks = [];
+    this.tasks = [];
   }
 
   async query(q: any, subscription = true): Promise<any> {
