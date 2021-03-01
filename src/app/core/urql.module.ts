@@ -82,7 +82,7 @@ export class UrqlModule {
     });
   }
 
-  subscription(q: any): any {
+  subscription(q: any): Observable<any> {
     return new Observable((observer: any) => {
       pipe(
         this.client.subscription(q),
