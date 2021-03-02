@@ -12,12 +12,15 @@
 <h1>Angular DGraph todo</h1>
 <section>
   <ul>
-    <li *ngFor="let t of dg.tasks">
+    <li *ngFor="let t of tasks | async">
       <span class="{{ t.completed ? 'is-complete' : ''}}">{{ t.title }} - {{ t.id }} </span>
-      <button (click)="toggle(t.id, t.completed)">{{ t.completed ? ' ❌ ' : ' ✔️ '}}</button>
-      <button (click)="remove(t.id)"> 🗑 </button>
+      <ng-container *ngIf="user">
+        <button (click)="toggle(t.id, t.completed)">{{ t.completed ? ' ❌ ' : ' ✔️ '}}</button>
+        <button (click)="remove(t.id)"> 🗑 </button>
+      </ng-container>
     </li>
   </ul>
 </section>
-<input #title (keyup.enter)="add(title.value)" />
-<button (click)="add(title.value)">Add Task</button>
+
+<input #title (keyup.enter)="add(title.value)" [disabled]="!user" />
+<button (click)="add(title.value)" [disabled]="!user">Add Task</button>

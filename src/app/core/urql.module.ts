@@ -16,7 +16,7 @@ import * as ws from 'ws';
 import { SSRExchange } from '@urql/core/dist/types/exchanges/ssr';
 import { HttpClient } from '@angular/common/http';
 import { pipe, toObservable } from 'wonka';
-import { Observable } from 'rxjs';
+import { from, Observable } from 'rxjs';
 
 @NgModule({
   declarations: [],
@@ -83,6 +83,11 @@ export class UrqlModule {
   }
 
   subscription(q: any): Observable<any> {
+    // server
+    if (this.isServerSide) {
+      return from(this.query(q));
+    }
+    // browser
     return new Observable((observer: any) => {
       pipe(
         this.client.subscription(q),

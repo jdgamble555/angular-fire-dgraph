@@ -1,15 +1,15 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, Inject, NgZone, OnInit, PLATFORM_ID, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, NgZone, PLATFORM_ID, ViewChild } from '@angular/core';
 import firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { DgraphService } from './core/dgraph.service';
+import { DgraphService, Task } from './core/dgraph.service';
 import {
   ADD_TASK,
   DEL_TASK,
-  GET_TASKS,
   SUB_GET_TASKS,
   UPDATE_TASK,
 } from "./core/queries";
+import { Observable } from 'rxjs';
 
 interface User {
   displayName: string;
@@ -23,11 +23,11 @@ interface User {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
   @ViewChild('title', { static: true }) title!: ElementRef;
 
-  tasks: any[] = [];
+  tasks: Observable<Task[]>
 
   user!: User;
 
@@ -43,6 +43,8 @@ export class AppComponent implements OnInit {
     this.afAuth.user.subscribe((user: any) => {
       this.user = user as User;
     });
+
+    this.tasks = this.dg.query(SUB_GET_TASKS);
   }
 
   async signIn(): Promise<void> {
@@ -52,16 +54,6 @@ export class AppComponent implements OnInit {
   async signOut(): Promise<void> {
     await this.afAuth.signOut();
   }
-
-  async ngOnInit(): Promise<void> {
-
-    if (!this.isBrowser) {
-      this.dg.query(GET_TASKS, false)
-    } else {
-      this.dg.query(SUB_GET_TASKS, true);
-    }
-  }
-
 
   async remove(id: string) {
 
