@@ -1,15 +1,13 @@
-import { isPlatformBrowser } from '@angular/common';
-import { Component, ElementRef, Inject, NgZone, PLATFORM_ID, ViewChild } from '@angular/core';
+import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
 import firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { DgraphService, Task } from './core/dgraph.service';
+import { DgraphService } from './core/dgraph.service';
 import {
   ADD_TASK,
   DEL_TASK,
   SUB_GET_TASKS,
   UPDATE_TASK,
 } from "./core/queries";
-import { Observable } from 'rxjs';
 
 interface User {
   displayName: string;
@@ -27,24 +25,23 @@ export class AppComponent {
 
   @ViewChild('title', { static: true }) title!: ElementRef;
 
-  tasks: Observable<Task[]>
-
   user!: User;
 
   isBrowser!: boolean;
 
   constructor(
     public dg: DgraphService,
-    @Inject(PLATFORM_ID) platformId: Object,
     public zone: NgZone,
     private afAuth: AngularFireAuth
   ) {
-    this.isBrowser = isPlatformBrowser(platformId);
+
+    // user logged in
     this.afAuth.user.subscribe((user: any) => {
       this.user = user as User;
     });
 
-    this.tasks = this.dg.query(SUB_GET_TASKS);
+    // run query
+    this.dg.query(SUB_GET_TASKS);
   }
 
   async signIn(): Promise<void> {

@@ -21,14 +21,11 @@ export class DgraphService {
     this.tasks = [];
   }
 
-  query(q: any): Observable<Task[]> {
+  query(q: any): void {
 
-    return this.urql.subscription(q).pipe(
-      map((r: any) => {
-        this.tasks = r.data.queryTask;
-        return this.tasks;
-      })
-    );
+    this.urql.subscription(q).subscribe((r: any) => {
+      this.tasks = r.data.queryTask;
+    });
 
   }
 
