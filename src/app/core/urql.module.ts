@@ -7,16 +7,14 @@ import {
   createClient,
   dedupExchange,
   fetchExchange,
-  ssrExchange,
   subscriptionExchange,
 } from '@urql/core';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
-import 'isomorphic-unfetch';
-import * as ws from 'ws';
-import { SSRExchange } from '@urql/core/dist/types/exchanges/ssr';
 import { HttpClient } from '@angular/common/http';
 import { pipe, toObservable } from 'wonka';
 import { from, Observable } from 'rxjs';
+import 'isomorphic-unfetch';
+import * as ws from 'ws';
 
 @NgModule({
   declarations: [],
@@ -26,7 +24,6 @@ export class UrqlModule {
 
   private client!: Client;
 
-  ssr!: SSRExchange;
 
   isServerSide!: boolean;
 
@@ -35,12 +32,9 @@ export class UrqlModule {
     private http: HttpClient
   ) {
 
-    this.isServerSide = !isPlatformBrowser(platformId);
+    // Add ssr exchange here if not using subscriptions
 
-    const ssr = ssrExchange({
-      isClient: !this.isServerSide,
-      initialState: !this.isServerSide ? (window as any).__URQL_DATA__ : undefined,
-    });
+    this.isServerSide = !isPlatformBrowser(platformId);
 
     const subscriptionClient = new SubscriptionClient(
       `wss://${environment.uri}`,
@@ -50,6 +44,7 @@ export class UrqlModule {
       },
       this.isServerSide ? ws : null
     );
+
     this.client = createClient({
       // replace fetch with httpclient for ssr
       fetch: async (url: any, q: any): Promise<any> => {
@@ -71,7 +66,6 @@ export class UrqlModule {
       exchanges: [
         dedupExchange,
         cacheExchange,
-        ssr,
         fetchExchange,
         subscriptionExchange({
           forwardSubscription(operation) {
