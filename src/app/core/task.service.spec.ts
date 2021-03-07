@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { DgraphService } from './dgraph.service';
+import { TaskService } from './task.service';
 
-describe('DgraphService', () => {
-  let service: DgraphService;
+describe('TaskService', () => {
+  let service: TaskService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DgraphService);
+    service = TestBed.inject(TaskService);
   });
 
   it('should be created', () => {

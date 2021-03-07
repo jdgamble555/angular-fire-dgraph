@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { UrqlModule } from './urql.module';
-import { map } from 'rxjs/operators';
 
 
 export interface Task {
@@ -13,18 +11,22 @@ export interface Task {
 @Injectable({
   providedIn: 'root'
 })
-export class DgraphService {
+export class TaskService {
 
   tasks: Task[];
 
-  constructor(public urql: UrqlModule) {
+  constructor(private urql: UrqlModule) {
     this.tasks = [];
+  }
+
+  mutation(q: any, vars: any): Promise<any> {
+    return this.urql.mutation(q, vars);
   }
 
   query(q: any): void {
 
     this.urql.subscription(q).subscribe((r: any) => {
-      this.tasks = r.data.queryTask;
+      this.tasks = r;
     });
 
   }

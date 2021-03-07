@@ -1,7 +1,7 @@
-import { Component, ElementRef, NgZone, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
-import { DgraphService } from './core/dgraph.service';
+import { TaskService } from './core/task.service';
 import {
   ADD_TASK,
   DEL_TASK,
@@ -27,11 +27,8 @@ export class AppComponent {
 
   user!: User;
 
-  isBrowser!: boolean;
-
   constructor(
-    public dg: DgraphService,
-    public zone: NgZone,
+    public ts: TaskService,
     private afAuth: AngularFireAuth
   ) {
 
@@ -41,7 +38,7 @@ export class AppComponent {
     });
 
     // run query
-    this.dg.query(SUB_GET_TASKS);
+    this.ts.query(SUB_GET_TASKS);
   }
 
   async signIn(): Promise<void> {
@@ -55,10 +52,10 @@ export class AppComponent {
   async remove(id: string) {
 
     // first remove optimistically
-    this.dg.delete(id);
+    this.ts.delete(id);
 
     // remove task from db
-    await this.dg.urql.mutation(DEL_TASK, {
+    await this.ts.mutation(DEL_TASK, {
       id: [id]
     })
       .then((r: any) => {
@@ -78,10 +75,10 @@ export class AppComponent {
     };
 
     // first update optimistically
-    this.dg.add(task);
+    this.ts.add(task);
 
     // add task to db
-    await this.dg.urql.mutation(ADD_TASK, {
+    await this.ts.mutation(ADD_TASK, {
       task
     })
       .then((r: any) => {
@@ -103,10 +100,10 @@ export class AppComponent {
     };
 
     // first update completed optimistically
-    this.dg.update(taskUpdate);
+    this.ts.update(taskUpdate);
 
     // toggle completed
-    await this.dg.urql.mutation(UPDATE_TASK, taskUpdate)
+    await this.ts.mutation(UPDATE_TASK, taskUpdate)
       .then((r: any) => {
         if (r.error) {
           console.log(r.error);

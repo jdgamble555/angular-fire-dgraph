@@ -15,6 +15,7 @@ import { pipe, toObservable } from 'wonka';
 import { from, Observable } from 'rxjs';
 import 'isomorphic-unfetch';
 import * as ws from 'ws';
+import { map } from 'rxjs/operators';
 
 @NgModule({
   declarations: [],
@@ -23,7 +24,6 @@ import * as ws from 'ws';
 export class UrqlModule {
 
   private client!: Client;
-
 
   isServerSide!: boolean;
 
@@ -77,6 +77,7 @@ export class UrqlModule {
   }
 
   subscription(q: any): Observable<any> {
+
     // server
     if (this.isServerSide) {
       return from(this.query(q));
@@ -87,12 +88,16 @@ export class UrqlModule {
         this.client.subscription(q),
         toObservable
       ).subscribe(observer);
-    });
-
+    })
+      .pipe(
+        map((r: any) => r.data[Object.keys(r.data)[0]])
+      );
   }
 
   async query(q: any): Promise<any> {
-    return await this.client.query(q).toPromise();
+    // get query
+    return await this.client.query(q).toPromise()
+      .then((r: any) => r.data[Object.keys(r.data)[0]]);
   }
 
   async mutation(q: any, vars: any): Promise<any> {

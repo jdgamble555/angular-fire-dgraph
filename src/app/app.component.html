@@ -12,7 +12,7 @@
 <h1>Angular DGraph todo</h1>
 <section>
   <ul>
-    <li *ngFor="let t of dg.tasks">
+    <li *ngFor="let t of ts.tasks">
       <span class="{{ t.completed ? 'is-complete' : ''}}">{{ t.title }} - {{ t.id }} </span>
       <ng-container *ngIf="user">
         <button (click)="toggle(t.id, t.completed)">{{ t.completed ? ' ❌ ' : ' ✔️ '}}</button>
