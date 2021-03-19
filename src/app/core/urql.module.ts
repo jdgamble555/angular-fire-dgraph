@@ -2,8 +2,8 @@ import { Inject, NgModule, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { environment } from './../../environments/environment';
 import {
-  cacheExchange,
   Client,
+  cacheExchange,
   createClient,
   dedupExchange,
   fetchExchange,
@@ -11,11 +11,12 @@ import {
 } from '@urql/core';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { HttpClient } from '@angular/common/http';
-import { pipe, toObservable } from 'wonka';
+import { pipe, toObservable, mergeMap, fromPromise, fromValue, map } from 'wonka';
 import { from, Observable } from 'rxjs';
+import { map as mapR } from 'rxjs/operators';
 import 'isomorphic-unfetch';
 import * as ws from 'ws';
-import { map } from 'rxjs/operators';
+import { AuthService } from './auth.service';
 
 @NgModule({
   declarations: [],
@@ -29,11 +30,19 @@ export class UrqlModule {
 
   constructor(
     @Inject(PLATFORM_ID) platformId: Object,
-    private http: HttpClient
+    private http: HttpClient,
+    private auth: AuthService
   ) {
 
-    // Add ssr exchange here if not using subscriptions
+    // get token from user...
 
+    const getHeaders = async () => {
+      return {
+        "X-Auth-Token": await this.auth.getToken()
+      };
+    };
+
+    // Add ssr exchange here if not using subscriptions
     this.isServerSide = !isPlatformBrowser(platformId);
 
     const subscriptionClient = new SubscriptionClient(
@@ -41,6 +50,7 @@ export class UrqlModule {
       {
         reconnect: true,
         lazy: true,
+        connectionParams: async () => await getHeaders()
       },
       this.isServerSide ? ws : null
     );
@@ -48,15 +58,13 @@ export class UrqlModule {
     this.client = createClient({
       // replace fetch with httpclient for ssr
       fetch: async (url: any, q: any): Promise<any> => {
-        const b = JSON.parse(q.body);
-        const opts = {
-          headers: q.headers,
-          operationName: b.operationName,
-          query: b.query,
-          variables: b.variables
-        };
+        const headers = await getHeaders();
         const data = await this.http
-          .post(url, opts)
+          .post(
+            url,
+            JSON.parse(q.body),
+            { headers }
+          )
           .toPromise();
         return {
           json: () => data
@@ -76,7 +84,7 @@ export class UrqlModule {
     });
   }
 
-  subscription(q: any): Observable<any> {
+  subscription(q: any, vars?: any): Observable<any> {
 
     // server
     if (this.isServerSide) {
@@ -85,22 +93,38 @@ export class UrqlModule {
     // browser
     return new Observable((observer: any) => {
       pipe(
-        this.client.subscription(q),
+        this.client.subscription(q, vars),
         toObservable
       ).subscribe(observer);
     })
       .pipe(
-        map((r: any) => r.data[Object.keys(r.data)[0]])
+        mapR((r: any) => {
+          if (r.error) {
+            console.error(r.error);
+          }
+          return r.data[Object.keys(r.data)[0]]
+        })
       );
   }
 
   async query(q: any): Promise<any> {
     // get query
     return await this.client.query(q).toPromise()
-      .then((r: any) => r.data[Object.keys(r.data)[0]]);
+      .then((r: any) => {
+        if (r.error) {
+          console.error(r.error);
+        }
+        return r.data[Object.keys(r.data)[0]]
+      });
   }
 
   async mutation(q: any, vars: any): Promise<any> {
-    return await this.client.mutation(q, vars).toPromise();
+    return await this.client.mutation(q, vars).toPromise()
+      .then((r: any) => {
+        if (r.error) {
+          console.error(r.error);
+        }
+        return r;
+      });
   }
 }

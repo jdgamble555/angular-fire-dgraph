@@ -5,6 +5,7 @@ import { TaskService } from './core/task.service';
 import {
   ADD_TASK,
   DEL_TASK,
+  //GET_TASKS,
   SUB_GET_TASKS,
   UPDATE_TASK,
 } from "./core/queries";
@@ -60,7 +61,7 @@ export class AppComponent {
     })
       .then((r: any) => {
         if (r.error) {
-          console.log(r.error);
+          console.error(r.error);
         }
       });
   }
@@ -83,7 +84,7 @@ export class AppComponent {
     })
       .then((r: any) => {
         if (r.error) {
-          console.log(r.error);
+          console.error(r.error);
         }
       });
 
@@ -106,7 +107,7 @@ export class AppComponent {
     await this.ts.mutation(UPDATE_TASK, taskUpdate)
       .then((r: any) => {
         if (r.error) {
-          console.log(r.error);
+          console.error(r.error);
         }
       });
   }
