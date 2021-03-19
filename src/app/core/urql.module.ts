@@ -11,9 +11,9 @@ import {
 } from '@urql/core';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
 import { HttpClient } from '@angular/common/http';
-import { pipe, toObservable, mergeMap, fromPromise, fromValue, map } from 'wonka';
+import { pipe, toObservable } from 'wonka';
 import { from, Observable } from 'rxjs';
-import { map as mapR } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import 'isomorphic-unfetch';
 import * as ws from 'ws';
 import { AuthService } from './auth.service';
@@ -35,7 +35,6 @@ export class UrqlModule {
   ) {
 
     // get token from user...
-
     const getHeaders = async () => {
       return {
         "X-Auth-Token": await this.auth.getToken()
@@ -98,7 +97,7 @@ export class UrqlModule {
       ).subscribe(observer);
     })
       .pipe(
-        mapR((r: any) => {
+        map((r: any) => {
           if (r.error) {
             console.error(r.error);
           }
