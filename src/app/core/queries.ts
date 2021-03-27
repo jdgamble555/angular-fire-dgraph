@@ -37,8 +37,8 @@ export const SUB_GET_TASKS = gql`
 `;
 
 export const ADD_TASK = gql`
-  mutation addTask($task: AddTaskInput!) {
-    addTask(input: [$task]) {
+  mutation addTask($task: [AddTaskInput!]!) {
+    addTask(input: $task) {
       task {
         id
         title

@@ -10,7 +10,7 @@ import {
   subscriptionExchange,
 } from '@urql/core';
 import { SubscriptionClient } from 'subscriptions-transport-ws';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { pipe, toObservable } from 'wonka';
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -20,7 +20,7 @@ import { AuthService } from './auth.service';
 
 @NgModule({
   declarations: [],
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule],
 })
 export class UrqlModule {
 
@@ -57,12 +57,11 @@ export class UrqlModule {
     this.client = createClient({
       // replace fetch with httpclient for ssr
       fetch: async (url: any, q: any): Promise<any> => {
-        const headers = await getHeaders();
         const data = await this.http
           .post(
             url,
             JSON.parse(q.body),
-            { headers }
+            { headers: await getHeaders() }
           )
           .toPromise();
         return {
@@ -101,7 +100,7 @@ export class UrqlModule {
           if (r.error) {
             console.error(r.error);
           }
-          return r.data[Object.keys(r.data)[0]]
+          return r.data[Object.keys(r.data)[0]];
         })
       );
   }
@@ -113,7 +112,7 @@ export class UrqlModule {
         if (r.error) {
           console.error(r.error);
         }
-        return r.data[Object.keys(r.data)[0]]
+        return r.data[Object.keys(r.data)[0]];
       });
   }
 
@@ -123,7 +122,7 @@ export class UrqlModule {
         if (r.error) {
           console.error(r.error);
         }
-        return r;
+        return r.data[Object.keys(r.data)[0]];
       });
   }
 }

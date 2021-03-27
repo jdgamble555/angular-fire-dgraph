@@ -52,41 +52,34 @@ export class AppComponent {
 
   async remove(id: string) {
 
+    const delId = {
+      id: [id]
+    };
+
     // first remove optimistically
     this.ts.delete(id);
 
     // remove task from db
-    await this.ts.mutation(DEL_TASK, {
-      id: [id]
-    })
-      .then((r: any) => {
-        if (r.error) {
-          console.error(r.error);
-        }
-      });
+    await this.ts.mutation(DEL_TASK, delId);
+
   }
 
   async add(title: string) {
 
     // new task
-    const task = {
-      title,
-      completed: false,
-      user: { username: this.user.email },
+    const newTask = {
+      task: [{
+        title,
+        completed: false,
+        user: { username: this.user.email },
+      }]
     };
 
     // first update optimistically
-    this.ts.add(task);
+    this.ts.add(newTask.task[0]);
 
     // add task to db
-    await this.ts.mutation(ADD_TASK, {
-      task
-    })
-      .then((r: any) => {
-        if (r.error) {
-          console.error(r.error);
-        }
-      });
+    await this.ts.mutation(ADD_TASK, newTask);
 
     // clear form field
     this.title.nativeElement.value = '';
@@ -104,11 +97,7 @@ export class AppComponent {
     this.ts.update(taskUpdate);
 
     // toggle completed
-    await this.ts.mutation(UPDATE_TASK, taskUpdate)
-      .then((r: any) => {
-        if (r.error) {
-          console.error(r.error);
-        }
-      });
+    await this.ts.mutation(UPDATE_TASK, taskUpdate);
+
   }
 }
