@@ -2,7 +2,9 @@
 
 # Configuration
 
-Create a [Slash Dgraph](https://slash.dgraph.io/) project with this [schema.graphql](schema.graphql)
+Create a [Slash Dgraph](https://slash.dgraph.io/) project.
+
+Add this [schema.graphql](schema.graphql) to the project with **Audience** containing your firebase project id.
 
 Configure **environments/environment.ts**
 
@@ -11,16 +13,41 @@ environment = {
   production: false,
   firebase: {
     ...
-    firebase data here
+    firebase config here
     ...
   },
   uri: 'Your endpoint'
 }
 ```
 
+Also create a file **functions/src/config.ts**
+
+```typescript
+export const config = {
+  firebase: {
+    ...
+    firebase config here
+    ...
+  },
+  uri: 'Your endpoint',
+  admin_email: 'Your admin email address'
+};
+
+```
+
+Note: The endpoint should not contain the scheme (http://)
+
+Deploy the firebase function **addUser** to your firebase project
+
+Goto: https://console.cloud.google.com/iam-admin/
+
+Make sure you add the role 'Service Account Token Creator' in your project to both:
+- YOUR-PROJECT@appspot.gserviceaccount.com
+- your google user member account
+
 # URQL NOTES
 
-These were  installed:
+These were installed to regular package:
 
 - npm i @urql/core graphql
 
@@ -47,6 +74,10 @@ queries.ts - all dgraph queries
 
 Added HttpClientModule for fetch replacement
 Added Firebase Modules
+
+Firebase Functions Package:
+
+- npm i --save firebase
 
 # AngularFireDgraph
 

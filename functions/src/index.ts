@@ -32,7 +32,7 @@ exports.addUser = functions.auth
           .catch((e: string) => console.error(e));
 
         // add the user to dgraph
-        return await fetch(config.uri, {
+        return await fetch('http://' + config.uri, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
