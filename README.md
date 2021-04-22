@@ -41,9 +41,7 @@ Deploy the firebase function **addUser** to your firebase project
 
 Goto: https://console.cloud.google.com/iam-admin/
 
-Make sure you add the role 'Service Account Token Creator' in your project to both:
-- YOUR-PROJECT@appspot.gserviceaccount.com
-- your google user member account
+Add the role `Service Account Token Creator` in your project to your google user member account
 
 # URQL NOTES
 
