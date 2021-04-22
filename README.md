@@ -2,9 +2,13 @@
 
 # Configuration
 
-Create a [Slash Dgraph](https://slash.dgraph.io/) project.
+`npm i` then `cd functions` then `npm i`
 
-Add this [schema.graphql](schema.graphql) to the project with **Audience** containing your firebase project id.
+Create a [Cloud Dgraph](https://cloud.dgraph.io/) project.
+
+Create a [Firebase Project](https://firebase.com) project.
+
+Add this [schema.graphql](schema.graphql) to the project with **Audience** containing your `firebase project id`.
 
 Configure **environments/environment.ts**
 
@@ -39,9 +43,13 @@ Note: The endpoint should not contain the scheme (http://)
 
 Deploy the firebase function **addUser** to your firebase project
 
+`cd functions` then `firebase deploy --only functions`
+
 Goto: https://console.cloud.google.com/iam-admin/
 
 Add the role `Service Account Token Creator` in your project to your google user member account
+
+Finally: `ng serve` or for ssr `npm run dev:ssr`
 
 # URQL NOTES
 

@@ -35,11 +35,9 @@ export class AuthService {
 
   async loginWithGoogle() {
     await this.afa.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-    this.router.navigate(['/dashboard']);
   }
 
   async logout() {
     await this.afa.signOut();
-    this.router.navigate(['/']);
   }
 }
