@@ -34,7 +34,7 @@ export class AppComponent {
   ) {
 
     // user logged in
-    this.afAuth.user.subscribe((user: any) => {
+    this.afAuth.onAuthStateChanged((user: any) => {
       this.user = user as User;
     });
 
@@ -71,7 +71,7 @@ export class AppComponent {
       task: [{
         title,
         completed: false,
-        user: { username: this.user.email },
+        user: { email: this.user.email },
       }]
     };
 

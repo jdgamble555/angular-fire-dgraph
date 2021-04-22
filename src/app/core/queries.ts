@@ -1,15 +1,5 @@
 import { gql } from "@urql/core";
 
-export const ADD_USER = gql`
-  mutation addUser($user: AddUserInput!) {
-    addUser(input: [$user]) {
-      user {
-        username
-      }
-    }
-  }
-`;
-
 export const GET_TASKS = gql`
   query GET_TASKS {
     queryTask {
@@ -17,7 +7,7 @@ export const GET_TASKS = gql`
       title
       completed
       user {
-        username
+        email
       }
     }
   }
@@ -30,7 +20,7 @@ export const SUB_GET_TASKS = gql`
       title
       completed
       user {
-        username
+        email
       }
     }
   }
@@ -44,7 +34,7 @@ export const ADD_TASK = gql`
         title
         completed
         user {
-          username
+          email
         }
       }
     }

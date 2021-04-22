@@ -18,15 +18,19 @@ export class AuthService {
   }
 
   async getToken(): Promise<any> {
-    return await new Promise((resolve: any) => {
-      this.afa.user.subscribe((user) => {
+    return await new Promise((resolve: any, reject: any) =>
+      this.afa.onAuthStateChanged((user: firebase.User | null) => {
         if (user) {
-          user.getIdToken(true).then((token) => {
-            resolve(token);
-          });
+          user?.getIdTokenResult()
+            .then(async (r: firebase.auth.IdTokenResult) => {
+              const token = (r.claims["https://dgraph.io/jwt/claims"])
+                ? r.token
+                : await user.getIdToken(true);
+              resolve(token);
+            }, (e: any) => reject(e));
         }
-      });
-    });
+      })
+    );
   }
 
   async loginWithGoogle() {
