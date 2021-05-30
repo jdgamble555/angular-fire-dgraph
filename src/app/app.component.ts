@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { TaskService } from './core/task.service';
@@ -22,7 +22,7 @@ interface User {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
   @ViewChild('title', { static: true }) title!: ElementRef;
 
@@ -38,8 +38,13 @@ export class AppComponent {
       this.user = user as User;
     });
 
+  }
+
+  async ngOnInit() {
+
     // run query
-    this.ts.query(SUB_GET_TASKS);
+    await this.ts.query(SUB_GET_TASKS);
+    
   }
 
   async signIn(): Promise<void> {

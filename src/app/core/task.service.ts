@@ -23,11 +23,15 @@ export class TaskService {
     return this.urql.mutation(q, vars);
   }
 
-  query(q: any): void {
+  async query(q: any): Promise<void> {
 
-    this.urql.subscription(q).subscribe((r: any) => {
-      this.tasks = r;
-    });
+    if (this.urql.isServerSide) {
+      this.tasks = await this.urql.query(q);
+    } else {
+      this.urql.subscription(q).subscribe((r: any) => {
+        this.tasks = r;
+      });
+    }
 
   }
 

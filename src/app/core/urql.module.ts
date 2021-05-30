@@ -100,7 +100,7 @@ export class UrqlModule {
           if (r.error) {
             console.error(r.error);
           }
-          return r.data[Object.keys(r.data)[0]];
+          return r.data ? r.data[Object.keys(r.data)[0]] : null;
         })
       );
   }
@@ -112,7 +112,7 @@ export class UrqlModule {
         if (r.error) {
           console.error(r.error);
         }
-        return r.data[Object.keys(r.data)[0]];
+        return r.data ? r.data[Object.keys(r.data)[0]] : null;
       });
   }
 
@@ -122,7 +122,7 @@ export class UrqlModule {
         if (r.error) {
           console.error(r.error);
         }
-        return r.data[Object.keys(r.data)[0]];
+        return r.data ? r.data[Object.keys(r.data)[0]] : null;
       });
   }
 }
