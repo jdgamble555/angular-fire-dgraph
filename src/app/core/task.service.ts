@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { UrqlModule } from './urql.module';
+import { DgraphModule } from './dgraph.module';
 
 export interface Task {
   id: string;
@@ -15,15 +15,15 @@ export class TaskService {
   tasks: Task[];
 
   constructor(
-    private urql: UrqlModule
+    private dgraph: DgraphModule
   ) {
     this.tasks = [];
   }
 
-  query(): void {
+  subscription(): void {
 
     // get task subscription
-    this.urql.type('task').query({
+    this.dgraph.type('task').subscription({
       _select: {
         id: true,
         title: true,
@@ -49,7 +49,7 @@ export class TaskService {
     this.tasks = [...this.tasks, { ...q, id }];
 
     // add to dgraph
-    await this.urql.add({
+    await this.dgraph.type('task').add({
       _set: q,
       _select: {
         completed: true
@@ -62,14 +62,14 @@ export class TaskService {
 
     // toggle completed task optimistically
     this.tasks = this.tasks.map((r: any) => {
-      if (r['id'] === q['id']) {
+      if (r['id'] === id) {
         r['completed'] = q['completed'];
       }
       return r;
     });
 
     // add to dgraph
-    await this.urql.update({
+    await this.dgraph.type('task').update({
       _find: {
         id
       },
@@ -84,7 +84,7 @@ export class TaskService {
     this.tasks = this.tasks.filter((r: any) => r['id'] !== id);
 
     // delete from dgraph
-    await this.urql.delete({
+    await this.dgraph.type('task').delete({
       _find: {
         id
       }

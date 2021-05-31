@@ -31,8 +31,8 @@ export class AppComponent {
       this.user = user as User;
     });
 
-    // run query
-    this.ts.query();
+    // run query subscription
+    this.ts.subscription();
 
   }
 
@@ -46,9 +46,8 @@ export class AppComponent {
 
   async remove(id: string) {
 
-    // first remove optimistically
+    // remove task
     this.ts.delete(id);
-
   }
 
   async add(title: string) {
@@ -66,11 +65,9 @@ export class AppComponent {
 
   async toggle(id: string, completed: boolean) {
 
-
-    // first update completed optimistically
+    // update task
     this.ts.update(id, {
       completed: !completed
     });
-
   }
 }

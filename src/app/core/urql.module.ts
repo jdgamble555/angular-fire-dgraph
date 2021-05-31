@@ -17,7 +17,6 @@ import { map } from 'rxjs/operators';
 import 'isomorphic-unfetch';
 import * as ws from 'ws';
 import { AuthService } from './auth.service';
-import { DgraphModule } from 'easy-dgraph';
 
 @NgModule({
   declarations: [],
@@ -26,8 +25,6 @@ import { DgraphModule } from 'easy-dgraph';
 export class UrqlModule {
 
   private client!: Client;
-
-  private _type!: string;
 
   isServerSide!: boolean;
 
@@ -85,40 +82,11 @@ export class UrqlModule {
     });
   }
 
-  type(type: string): this {
-    this._type = type;
-    return this;
-  }
-
-  query(q: any) {
-    const { gql } = this.newDG().query(q).generateSub();
-    return this._subscription(gql);
-  }
-
-  async add(q: any) {
-    const { gql } = this.newDG().add(q).generate();
-    return await this._mutation(gql);
-  }
-
-  async update(q: any) {
-    const { gql } = this.newDG().update(q).generate();
-    return await this._mutation(gql);
-  }
-
-  async delete(q: any) {
-    const { gql } = this.newDG().delete(q).generate();
-    return await this._mutation(gql);
-  }
-
-  private newDG() {
-    return new DgraphModule(this._type);
-  }
-
-  private _subscription(q: any, vars?: any): Observable<any> {
+  subscription(q: any, vars?: any): Observable<any> {
 
     // server
     if (this.isServerSide) {
-      return from(this._query(q));
+      return from(this.query(q));
     }
     // browser
     return new Observable((observer: any) => {
@@ -137,7 +105,7 @@ export class UrqlModule {
       );
   }
 
-  private async _query(q: any): Promise<any> {
+  async query(q: any): Promise<any> {
     // get query
     return await this.client.query(q).toPromise()
       .then((r: any) => {
@@ -148,7 +116,7 @@ export class UrqlModule {
       });
   }
 
-  private async _mutation(q: any, vars?: any): Promise<any> {
+  async mutation(q: any, vars?: any): Promise<any> {
     return await this.client.mutation(q, vars).toPromise()
       .then((r: any) => {
         if (r.error) {
