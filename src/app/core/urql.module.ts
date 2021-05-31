@@ -116,7 +116,7 @@ export class UrqlModule {
       });
   }
 
-  async mutation(q: any, vars: any): Promise<any> {
+  async mutation(q: any, vars?: any): Promise<any> {
     return await this.client.mutation(q, vars).toPromise()
       .then((r: any) => {
         if (r.error) {

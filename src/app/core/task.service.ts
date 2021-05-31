@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { DgraphModule } from './dgraph';
 import { UrqlModule } from './urql.module';
 
 
@@ -15,36 +16,53 @@ export class TaskService {
 
   tasks: Task[];
 
-  constructor(private urql: UrqlModule) {
+  constructor(
+    private urql: UrqlModule
+  ) {
     this.tasks = [];
   }
 
-  mutation(q: any, vars: any): Promise<any> {
-    return this.urql.mutation(q, vars);
-  }
+  query(): void {
 
-  async query(q: any): Promise<void> {
+    const { gql } = new DgraphModule('task').query({
+      _select: {
+        id: true,
+        title: true,
+        completed: true,
+        user: {
+          _select: {
+            email: true
+          }
+        }
+      }
+    }).generateSub();
 
-    if (this.urql.isServerSide) {
-      this.tasks = await this.urql.query(q);
-    } else {
-      this.urql.subscription(q).subscribe((r: any) => {
+    this.urql.subscription(gql)
+      .subscribe((r: any) => {
         this.tasks = r;
       });
-    }
-
   }
 
-  add(q: any): void {
+  async add(q: any): Promise<void> {
 
     // random string will be replaced with dgraph id
     const id = this.randString();
 
     // add task optimistically
     this.tasks = [...this.tasks, { ...q, id }];
+
+    const { gql } = new DgraphModule('task').add({
+      _set: q,
+      _select: {
+        completed: true
+      }
+    }).generate();
+
+    await this.urql.mutation(gql);
+
   }
 
-  update(q: any): void {
+  async update(id: string, q: any): Promise<void> {
 
     // toggle completed task optimistically
     this.tasks = this.tasks.map((r: any) => {
@@ -53,12 +71,31 @@ export class TaskService {
       }
       return r;
     });
+
+    const { gql } = new DgraphModule('task').update({
+      _find: {
+        id
+      },
+      _set: q
+    }).generate();
+
+    await this.urql.mutation(gql);
+
   }
 
-  delete(id: string): void {
+  async delete(id: string): Promise<void> {
 
     // delete task optimistically
     this.tasks = this.tasks.filter((r: any) => r['id'] !== id);
+
+    const { gql } = new DgraphModule('task').delete({
+      _find: {
+        id
+      }
+    }).generate();
+
+    await this.urql.mutation(gql);
+
   }
 
   private randString(): string {

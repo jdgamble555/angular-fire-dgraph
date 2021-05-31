@@ -1,14 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import firebase from 'firebase/app';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { TaskService } from './core/task.service';
-import {
-  ADD_TASK,
-  DEL_TASK,
-  //GET_TASKS,
-  SUB_GET_TASKS,
-  UPDATE_TASK,
-} from "./core/queries";
 
 interface User {
   displayName: string;
@@ -22,7 +15,7 @@ interface User {
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
   @ViewChild('title', { static: true }) title!: ElementRef;
 
@@ -38,13 +31,9 @@ export class AppComponent implements OnInit {
       this.user = user as User;
     });
 
-  }
-
-  async ngOnInit() {
-
     // run query
-    await this.ts.query(SUB_GET_TASKS);
-    
+    this.ts.query();
+
   }
 
   async signIn(): Promise<void> {
@@ -57,34 +46,19 @@ export class AppComponent implements OnInit {
 
   async remove(id: string) {
 
-    const delId = {
-      id: [id]
-    };
-
     // first remove optimistically
     this.ts.delete(id);
-
-    // remove task from db
-    await this.ts.mutation(DEL_TASK, delId);
 
   }
 
   async add(title: string) {
 
-    // new task
-    const newTask = {
-      task: [{
-        title,
-        completed: false,
-        user: { email: this.user.email },
-      }]
-    };
-
-    // first update optimistically
-    this.ts.add(newTask.task[0]);
-
-    // add task to db
-    await this.ts.mutation(ADD_TASK, newTask);
+    // add task
+    this.ts.add({
+      title,
+      completed: false,
+      user: { email: this.user.email },
+    });
 
     // clear form field
     this.title.nativeElement.value = '';
@@ -92,17 +66,11 @@ export class AppComponent implements OnInit {
 
   async toggle(id: string, completed: boolean) {
 
-    // updated task
-    const taskUpdate = {
-      id,
-      completed: !completed
-    };
 
     // first update completed optimistically
-    this.ts.update(taskUpdate);
-
-    // toggle completed
-    await this.ts.mutation(UPDATE_TASK, taskUpdate);
+    this.ts.update(id, {
+      completed: !completed
+    });
 
   }
 }
