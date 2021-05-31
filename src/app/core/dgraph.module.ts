@@ -26,6 +26,16 @@ export class DgraphModule {
     return this.urql.subscription(gql);
   }
 
+  async get(q: any) {
+    const { gql } = this.newDG().get(q).generate();
+    return this.urql.query(gql);
+  }
+
+  async query(q: any) {
+    const { gql } = this.newDG().query(q).generate();
+    return this.urql.query(gql);
+  }
+
   async add(q: any) {
     const { gql } = this.newDG().add(q).generate();
     return await this.urql.mutation(gql);
