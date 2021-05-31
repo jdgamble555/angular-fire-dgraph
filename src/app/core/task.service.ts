@@ -25,13 +25,9 @@ export class TaskService {
     // get task subscription
     this.dgraph.type('task').subscription({
       _select: {
-        id: true,
-        title: true,
-        completed: true,
+        id: 1, title: 1, completed: 1,
         user: {
-          _select: {
-            email: true
-          }
+          _select: { email: 1 }
         }
       }
     })
@@ -51,9 +47,7 @@ export class TaskService {
     // add to dgraph
     await this.dgraph.type('task').add({
       _set: q,
-      _select: {
-        completed: true
-      }
+      _select: { completed: 1 }
     });
 
   }
@@ -70,9 +64,7 @@ export class TaskService {
 
     // add to dgraph
     await this.dgraph.type('task').update({
-      _find: {
-        id
-      },
+      _find: { id },
       _set: q
     });
 
@@ -85,9 +77,7 @@ export class TaskService {
 
     // delete from dgraph
     await this.dgraph.type('task').delete({
-      _find: {
-        id
-      }
+      _find: { id }
     });
 
   }
