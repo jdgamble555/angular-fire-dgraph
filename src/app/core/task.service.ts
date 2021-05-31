@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DgraphModule } from './dgraph';
 import { UrqlModule } from './urql.module';
-
 
 export interface Task {
   id: string;
@@ -24,7 +22,8 @@ export class TaskService {
 
   query(): void {
 
-    const { gql } = new DgraphModule('task').query({
+    // get task subscription
+    this.urql.type('task').query({
       _select: {
         id: true,
         title: true,
@@ -35,9 +34,7 @@ export class TaskService {
           }
         }
       }
-    }).generateSub();
-
-    this.urql.subscription(gql)
+    })
       .subscribe((r: any) => {
         this.tasks = r;
       });
@@ -51,14 +48,13 @@ export class TaskService {
     // add task optimistically
     this.tasks = [...this.tasks, { ...q, id }];
 
-    const { gql } = new DgraphModule('task').add({
+    // add to dgraph
+    await this.urql.add({
       _set: q,
       _select: {
         completed: true
       }
-    }).generate();
-
-    await this.urql.mutation(gql);
+    });
 
   }
 
@@ -72,14 +68,13 @@ export class TaskService {
       return r;
     });
 
-    const { gql } = new DgraphModule('task').update({
+    // add to dgraph
+    await this.urql.update({
       _find: {
         id
       },
       _set: q
-    }).generate();
-
-    await this.urql.mutation(gql);
+    });
 
   }
 
@@ -88,13 +83,12 @@ export class TaskService {
     // delete task optimistically
     this.tasks = this.tasks.filter((r: any) => r['id'] !== id);
 
-    const { gql } = new DgraphModule('task').delete({
+    // delete from dgraph
+    await this.urql.delete({
       _find: {
         id
       }
-    }).generate();
-
-    await this.urql.mutation(gql);
+    });
 
   }
 
