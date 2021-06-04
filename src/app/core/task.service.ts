@@ -24,16 +24,15 @@ export class TaskService {
 
     // get task subscription
     this.dgraph.type('task').subscription({
-      _select: {
-        id: 1, title: 1, completed: 1,
-        user: {
-          _select: { email: 1 }
-        }
+      id: 1,
+      title: 1,
+      completed: 1,
+      user: {
+        email: 1
       }
-    })
-      .subscribe((r: any) => {
-        this.tasks = r;
-      });
+    }).subscribe((r: any) => {
+      this.tasks = r;
+    });
   }
 
   async add(q: any): Promise<void> {
@@ -45,9 +44,8 @@ export class TaskService {
     this.tasks = [...this.tasks, { ...q, id }];
 
     // add to dgraph
-    await this.dgraph.type('task').add({
-      _set: q,
-      _select: { completed: 1 }
+    await this.dgraph.type('task').set(q).add({
+      completed: 1
     });
 
   }
@@ -63,10 +61,7 @@ export class TaskService {
     });
 
     // add to dgraph
-    await this.dgraph.type('task').update({
-      _find: { id },
-      _set: q
-    });
+    await this.dgraph.type('task').filter(id).set(q).update();
 
   }
 
@@ -76,9 +71,7 @@ export class TaskService {
     this.tasks = this.tasks.filter((r: any) => r['id'] !== id);
 
     // delete from dgraph
-    await this.dgraph.type('task').delete({
-      _find: { id }
-    });
+    await this.dgraph.type('task').filter(id).delete();
 
   }
 

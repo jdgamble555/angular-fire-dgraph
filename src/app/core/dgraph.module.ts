@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Dgraph } from 'easy-dgraph';
 import { UrqlModule } from './urql.module';
 
-
 @NgModule({
   declarations: [],
   imports: [
@@ -12,47 +11,53 @@ import { UrqlModule } from './urql.module';
 })
 export class DgraphModule {
 
-  private _type!: string;
+  private dg!: Dgraph;
 
-  constructor(private urql: UrqlModule) {}
+  constructor(private urql: UrqlModule) { }
 
   type(type: string): this {
-    this._type = type;
+    this.dg = new Dgraph(type);
+    return this;
+  }
+
+  set(q: any) {
+    this.dg = this.dg.set(q);
+    return this;
+  }
+
+  filter(q: any) {
+    this.dg = this.dg.filter(q);
     return this;
   }
 
   subscription(q: any) {
-    const { gql } = this.newDG().query(q).generateSub();
+    const gql = this.dg.query(q).buildSubscription();
     return this.urql.subscription(gql);
   }
 
   async get(q: any) {
-    const { gql } = this.newDG().get(q).generate();
+    const gql = this.dg.get(q).build();
     return this.urql.query(gql);
   }
 
   async query(q: any) {
-    const { gql } = this.newDG().query(q).generate();
+    const gql = this.dg.query(q).build();
     return this.urql.query(gql);
   }
 
   async add(q: any) {
-    const { gql } = this.newDG().add(q).generate();
+    const gql = this.dg.add(q).build();
     return await this.urql.mutation(gql);
   }
 
-  async update(q: any) {
-    const { gql } = this.newDG().update(q).generate();
+  async update(q?: any) {
+    const gql = this.dg.update(q).build();
     return await this.urql.mutation(gql);
   }
 
-  async delete(q: any) {
-    const { gql } = this.newDG().delete(q).generate();
+  async delete(q?: any) {
+    const gql = this.dg.delete(q).build();
     return await this.urql.mutation(gql);
-  }
-
-  private newDG() {
-    return new Dgraph(this._type);
   }
 
 }
