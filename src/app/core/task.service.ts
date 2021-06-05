@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { dgraph, DgraphService } from './dgraph.service';
+import { optimistic } from 'easy-dgraph';
+import { DgraphService } from './dgraph.service';
 
 
 export interface Task {
@@ -13,10 +14,10 @@ export interface Task {
 })
 export class TaskService {
 
-  tasks: Task[];
+  tasks: optimistic;
 
   constructor(private dgraph: DgraphService) {
-    this.tasks = [];
+    this.tasks = new optimistic();
   }
 
   subscription(): void {
@@ -30,17 +31,14 @@ export class TaskService {
         email: 1
       }
     }).buildSubscription().subscribe((r: any) => {
-      this.tasks = r;
+      this.tasks.data = r;
     });
   }
 
   async add(q: any): Promise<void> {
 
-    // random string will be replaced with dgraph id
-    const id = this.randString();
-
-    // add task optimistically
-    this.tasks = [...this.tasks, { ...q, id }];
+    // add optimistically
+    this.tasks.add(q);
 
     // add to dgraph
     await this.dgraph.type('task').set(q).add({
@@ -50,13 +48,8 @@ export class TaskService {
 
   async update(id: string, q: any): Promise<void> {
 
-    // toggle completed task optimistically
-    this.tasks = this.tasks.map((r: any) => {
-      if (r['id'] === id) {
-        r['completed'] = q['completed'];
-      }
-      return r;
-    });
+    // update optimistically
+    this.tasks.update(id, q);
 
     // add to dgraph
     await this.dgraph.type('task').filter(id).set(q).update().build();
@@ -64,16 +57,11 @@ export class TaskService {
 
   async delete(id: string): Promise<void> {
 
-    // delete task optimistically
-    this.tasks = this.tasks.filter((r: any) => r['id'] !== id);
+    // delete optimistically
+    this.tasks.delete(id);
 
     // delete from dgraph
     await this.dgraph.type('task').filter(id).delete().build();
   }
 
-  private randString(): string {
-
-    // generate random string
-    return Math.random().toString(36).substr(2, 5);
-  }
 }

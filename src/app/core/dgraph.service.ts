@@ -22,15 +22,17 @@ export class dgraph extends Dgraph {
   }
 
   async build() {
+    const gql = super.build();
     if (this._operation === 'mutation') {
-      return await this.urql.mutation(super.build());
+      return await this.urql.mutation(gql);
     }
-    return await this.urql.query(super.build());
+    return await this.urql.query(gql);
   }
 
   buildSubscription() {
     this.operation('subscription');
-    return this.urql.subscription(super.build());
+    const gql = super.build();
+    return this.urql.subscription(gql);
   }
 
 }
