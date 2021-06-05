@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { DgraphModule } from './dgraph.module';
+import { dgraph } from './dgraph';
+import { UrqlModule } from './urql.module';
 
 export interface Task {
   id: string;
@@ -14,23 +15,25 @@ export class TaskService {
 
   tasks: Task[];
 
-  constructor(
-    private dgraph: DgraphModule
-  ) {
+  constructor(private urql: UrqlModule) {
     this.tasks = [];
+  }
+
+  private dgraph(t: string) {
+    return new dgraph(this.urql).type(t);
   }
 
   subscription(): void {
 
     // get task subscription
-    this.dgraph.type('task').subscription({
+    this.dgraph('task').query({
       id: 1,
       title: 1,
       completed: 1,
       user: {
         email: 1
       }
-    }).subscribe((r: any) => {
+    }).buildSubscription().subscribe((r: any) => {
       this.tasks = r;
     });
   }
@@ -44,9 +47,9 @@ export class TaskService {
     this.tasks = [...this.tasks, { ...q, id }];
 
     // add to dgraph
-    await this.dgraph.type('task').set(q).add({
+    await this.dgraph('task').set(q).add({
       completed: 1
-    });
+    }).build();
 
   }
 
@@ -61,7 +64,7 @@ export class TaskService {
     });
 
     // add to dgraph
-    await this.dgraph.type('task').filter(id).set(q).update();
+    await this.dgraph('task').filter(id).set(q).update().build();
 
   }
 
@@ -71,7 +74,7 @@ export class TaskService {
     this.tasks = this.tasks.filter((r: any) => r['id'] !== id);
 
     // delete from dgraph
-    await this.dgraph.type('task').filter(id).delete();
+    await this.dgraph('task').filter(id).delete().build();
 
   }
 

@@ -40,4 +40,7 @@ export class AuthService {
   async logout() {
     await this.afa.signOut();
   }
+
 }
+
+
