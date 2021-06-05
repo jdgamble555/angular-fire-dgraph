@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { dgraph } from './dgraph';
-import { UrqlModule } from './urql.module';
+import { dgraph, DgraphService } from './dgraph.service';
+
 
 export interface Task {
   id: string;
@@ -15,18 +15,14 @@ export class TaskService {
 
   tasks: Task[];
 
-  constructor(private urql: UrqlModule) {
+  constructor(private dgraph: DgraphService) {
     this.tasks = [];
-  }
-
-  private dgraph(t: string) {
-    return new dgraph(this.urql).type(t);
   }
 
   subscription(): void {
 
     // get task subscription
-    this.dgraph('task').query({
+    this.dgraph.type('task').query({
       id: 1,
       title: 1,
       completed: 1,
@@ -47,10 +43,9 @@ export class TaskService {
     this.tasks = [...this.tasks, { ...q, id }];
 
     // add to dgraph
-    await this.dgraph('task').set(q).add({
+    await this.dgraph.type('task').set(q).add({
       completed: 1
     }).build();
-
   }
 
   async update(id: string, q: any): Promise<void> {
@@ -64,8 +59,7 @@ export class TaskService {
     });
 
     // add to dgraph
-    await this.dgraph('task').filter(id).set(q).update().build();
-
+    await this.dgraph.type('task').filter(id).set(q).update().build();
   }
 
   async delete(id: string): Promise<void> {
@@ -74,8 +68,7 @@ export class TaskService {
     this.tasks = this.tasks.filter((r: any) => r['id'] !== id);
 
     // delete from dgraph
-    await this.dgraph('task').filter(id).delete().build();
-
+    await this.dgraph.type('task').filter(id).delete().build();
   }
 
   private randString(): string {
@@ -83,5 +76,4 @@ export class TaskService {
     // generate random string
     return Math.random().toString(36).substr(2, 5);
   }
-
 }
