@@ -60,7 +60,7 @@ export class TaskService {
     // delete optimistically
     this.tasks.delete(id);
 
-    // delete from dgraph
+  // delete from dgraph
     await this.dgraph.type('task').filter(id).delete().build();
   }
 
